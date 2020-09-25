@@ -96,6 +96,12 @@ public class GpsTracker extends Service implements LocationListener {
         }
     }
 
+    /**
+     * Locale ????
+     * @param latitude
+     * @param longitude
+     * @return
+     */
     public String getCurrentAddress( double latitude, double longitude) {
         //지오코더... GPS를 주소로 변환
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());

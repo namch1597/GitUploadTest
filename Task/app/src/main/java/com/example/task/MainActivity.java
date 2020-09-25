@@ -1,6 +1,7 @@
 package com.example.task;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 
 import android.Manifest;
 import android.content.Intent;
@@ -12,31 +13,23 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.task.databinding.ActivityMainBinding;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView tvCenter;
-    Button btTop;
-    Button btBottom;
-    Button btLeft;
-    Button btRight;
+    ActivityMainBinding binding;
 
     private static final int MSG_PERMISSIONS_REQ = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        tvCenter = findViewById(R.id.tv_center);
-        btTop = findViewById(R.id.bt_top);
-        btBottom = findViewById(R.id.bt_bottom);
-        btLeft = findViewById(R.id.bt_left);
-        btRight = findViewById(R.id.bt_right);
-
-        btTop.setOnClickListener(this);
-        btBottom.setOnClickListener(this);
-        btLeft.setOnClickListener(this);
-        btRight.setOnClickListener(this);
+        binding.btTop.setOnClickListener(this);
+        binding.btBottom.setOnClickListener(this);
+        binding.btLeft.setOnClickListener(this);
+        binding.btRight.setOnClickListener(this);
     }
 
     @Override
