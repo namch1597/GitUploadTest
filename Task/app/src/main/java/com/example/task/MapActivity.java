@@ -9,13 +9,14 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import com.example.task.Model.DirectionResponses;
-import com.example.task.Model.Subway;
+import com.example.task.Model.SubwayModel.DirectionResponses;
+import com.example.task.Model.SubwayModel.Subway;
 import com.example.task.Network.APIClient;
 import com.example.task.Network.APIInterface;
 import com.example.task.Utils.ContentManager;
@@ -39,7 +40,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public class MapActivity extends AppCompatActivity  implements OnMapReadyCallback,View.OnClickListener {
 
     ActivityMapBinding binding;
@@ -47,7 +47,6 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
     GpsTracker gpsTracker;
     double latitude = 0.0f;
     double longitude = 0.0f;
-    LatLng latLng;
 
     public static Context mContext;
 
@@ -57,6 +56,9 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
 
     ArrayAdapter spinnerLeftAdapter;
     ArrayAdapter spinnerRightAdapter;
+
+    String realJuso;
+    LatLng NOW;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,8 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
         subways = ContentManager.getInstance().getSubways();
 
         binding.btSearch.setOnClickListener(this);
+        binding.btBack.setOnClickListener(this);
+        binding.tvNowLocation.setOnClickListener(this);
 
         FirstViewSetting();
 
@@ -106,35 +110,60 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
     public void onClick(View v) {
 
         switch (v.getId()) {
+                case R.id.bt_search:
 
-            case R.id.bt_search:
+                    binding.pbCenter.setVisibility(View.VISIBLE);
 
-                Address leftText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spLeft.getSelectedItem().toString()));
-                Address rightText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spRight.getSelectedItem().toString()));
+                    Address leftText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spLeft.getSelectedItem().toString()));
+                    Address rightText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spRight.getSelectedItem().toString()));
 
-                String from = String.valueOf(leftText.getLatitude()) + "," + String.valueOf(leftText.getLongitude());
-                String to = String.valueOf(rightText.getLatitude()) + "," + String.valueOf(rightText.getLongitude());
+                    String from = String.valueOf(leftText.getLatitude()) + "," + String.valueOf(leftText.getLongitude());
+                    String to = String.valueOf(rightText.getLatitude()) + "," + String.valueOf(rightText.getLongitude());
 
-                APIInterface apiServices = APIClient.apiServices(this);
-                apiServices.getDirection(from, to, "transit","AIzaSyA9lCWN--EpZshKkp2hrfsE-9Sr8GZyIQc")
-                        .enqueue(new Callback<DirectionResponses>() {
-                            @Override
-                            public void onResponse(@NonNull Call<DirectionResponses> call, @NonNull Response<DirectionResponses> response) {
-                                mMap.clear();
-                                drawPolyline(response);
-                                Log.d("bisa dong oke", response.message());
+                    APIInterface subwayServices = APIClient.subwayServices(this);
+                    subwayServices.getDirection(from, to, "transit","AIzaSyA9lCWN--EpZshKkp2hrfsE-9Sr8GZyIQc")
+                            .enqueue(new Callback<DirectionResponses>() {
+                                @Override
+                                public void onResponse(@NonNull Call<DirectionResponses> call, @NonNull Response<DirectionResponses> response) {
+                                    mMap.clear();
+                                    drawPolyline(response);
+                                    Log.d("bisa dong oke", response.message());
 
-                                LatLng SEARCHSTART = new LatLng(leftText.getLatitude(), leftText.getLongitude());
+                                    LatLng SEARCHSTART = new LatLng(leftText.getLatitude(), leftText.getLongitude());
 
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(SEARCHSTART, 15));
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(SEARCHSTART, 15));
 
-                            }
+                                    binding.pbCenter.setVisibility(View.INVISIBLE);
 
-                            @Override
-                            public void onFailure(@NonNull Call<DirectionResponses> call, @NonNull Throwable t) {
-                                Log.e("anjir error", t.getLocalizedMessage());
-                            }
-                        });
+                                }
+
+                                @Override
+                                public void onFailure(@NonNull Call<DirectionResponses> call, @NonNull Throwable t) {
+                                    Log.e("anjir error", t.getLocalizedMessage());
+                                    binding.pbCenter.setVisibility(View.INVISIBLE);
+                                }
+                            });
+                break;
+                case R.id.tv_now_location:
+
+                    binding.pbCenter.setVisibility(View.VISIBLE);
+
+                    mMap.clear();
+
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(NOW);
+                    markerOptions.title("현재위치");
+                    mMap.addMarker(markerOptions);
+
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NOW, 15));
+
+                    binding.pbCenter.setVisibility(View.INVISIBLE);
+
+                    break;
+                case R.id.bt_back:
+
+                    finish();
+
                 break;
 
         }
@@ -146,7 +175,7 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
             String shape = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
             PolylineOptions polyline = new PolylineOptions()
                     .addAll(PolyUtil.decode(shape))
-                    .width(8f)
+                    .width(15f)
                     .color(Color.RED);
             mMap.addPolyline(polyline);
         }
@@ -154,6 +183,8 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
+
+        binding.pbCenter.setVisibility(View.VISIBLE);
 
         gpsTracker = new GpsTracker(mContext);
 
@@ -167,18 +198,21 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
             return;
         }
 
-        Address address = getCurrentAddress(latitude,longitude,"");
-
         mMap = googleMap;
 
-        LatLng NOW = new LatLng(latitude, longitude);
+        NOW = new LatLng(latitude, longitude);
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(NOW);
         markerOptions.title("현재위치");
         mMap.addMarker(markerOptions);
 
+        realJuso = getCurrentAddress(latitude,longitude,"").getAddressLine(0);
+        binding.tvNowLocation.setText(Html.fromHtml("<u>" + realJuso + "</u>"));
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(NOW, 15));
+
+        binding.pbCenter.setVisibility(View.INVISIBLE);
 
     }
 

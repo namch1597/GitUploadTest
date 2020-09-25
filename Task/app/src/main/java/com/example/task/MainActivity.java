@@ -19,7 +19,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     ActivityMainBinding binding;
 
-    private static final int MSG_PERMISSIONS_REQ = 1001;
+    private static final int MSG_PERMISSIONS_SUBWAY = 1001;
+    private static final int MSG_PERMISSIONS_WAETHER = 1002;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
 
             case R.id.bt_top:
+
+                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MSG_PERMISSIONS_WAETHER);
+                    } else {
+                        Intent intent = new Intent(this,WeatherActivity.class);
+                        startActivity(intent);
+                    }
+                }*/
+
                 break;
 
 
@@ -46,13 +57,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
             case R.id.bt_left:
+
                 break;
 
 
             case R.id.bt_right:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MSG_PERMISSIONS_REQ);
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MSG_PERMISSIONS_SUBWAY);
                     } else {
                         Intent intent = new Intent(this,MapActivity.class);
                         startActivity(intent);
@@ -68,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MSG_PERMISSIONS_REQ: {
+            case MSG_PERMISSIONS_SUBWAY: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 ) {
                     // permission was granted
@@ -78,7 +90,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // permission denied
                     Toast.makeText(MainActivity.this, "위치권한을 허용해주세요.", Toast.LENGTH_SHORT).show();
                 }
-                return;
+                break;
+            }
+            case MSG_PERMISSIONS_WAETHER: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                ) {
+                    // permission was granted
+                    Intent intent = new Intent(this,WeatherActivity.class);
+                    startActivity(intent);
+                } else {
+                    // permission denied
+                    Toast.makeText(MainActivity.this, "위치권한을 허용해주세요.", Toast.LENGTH_SHORT).show();
+                }
+                break;
             }
         }
     }

@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 
-import com.example.task.Model.Subway;
+import com.example.task.Model.SubwayModel.Subway;
 import com.example.task.Utils.ContentManager;
 
 import org.json.JSONArray;

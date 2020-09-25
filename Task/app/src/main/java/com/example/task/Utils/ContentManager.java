@@ -1,18 +1,7 @@
 package com.example.task.Utils;
 
-import android.content.Context;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.util.Log;
+import com.example.task.Model.SubwayModel.Subway;
 
-import com.example.task.Model.Subway;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ContentManager {

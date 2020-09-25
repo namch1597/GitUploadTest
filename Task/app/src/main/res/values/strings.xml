@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Task</string>
 
-    <string name="base_url">https://maps.googleapis.com</string>
+    <string name="subway_base_url">https://maps.googleapis.com</string>
+    <string name="weather_base_url">https://api.openweathermap.org</string>
 </resources>
