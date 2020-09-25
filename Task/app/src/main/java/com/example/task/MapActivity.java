@@ -115,7 +115,11 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
                     binding.pbCenter.setVisibility(View.VISIBLE);
 
                     Address leftText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spLeft.getSelectedItem().toString()));
+                    LatLng leftLatLng = new LatLng(leftText.getLatitude(),leftText.getLongitude());
+
                     Address rightText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spRight.getSelectedItem().toString()));
+                    LatLng rightLatLng = new LatLng(rightText.getLatitude(),rightText.getLongitude());
+
 
                     String from = String.valueOf(leftText.getLatitude()) + "," + String.valueOf(leftText.getLongitude());
                     String to = String.valueOf(rightText.getLatitude()) + "," + String.valueOf(rightText.getLongitude());
@@ -126,6 +130,8 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
                                 @Override
                                 public void onResponse(@NonNull Call<DirectionResponses> call, @NonNull Response<DirectionResponses> response) {
                                     mMap.clear();
+                                    addMarker(leftLatLng,"출발지점");
+                                    addMarker(rightLatLng,"도착지점");
                                     drawPolyline(response);
                                     Log.d("bisa dong oke", response.message());
 
@@ -202,10 +208,7 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
 
         NOW = new LatLng(latitude, longitude);
 
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(NOW);
-        markerOptions.title("현재위치");
-        mMap.addMarker(markerOptions);
+        addMarker(NOW,"현재위치");
 
         realJuso = getCurrentAddress(latitude,longitude,"").getAddressLine(0);
         binding.tvNowLocation.setText(Html.fromHtml("<u>" + realJuso + "</u>"));
@@ -238,6 +241,15 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
         Address address = addresses.get(0);
         return address;
         //여기부터는 GPS 활성화를 위한 메소드들
+    }
+
+    public void addMarker(LatLng latLng, String title) {
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.title(title);
+        mMap.addMarker(markerOptions);
+
     }
 
 
