@@ -40,19 +40,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.bt_top:
 
-                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MSG_PERMISSIONS_WAETHER);
                     } else {
-                        Intent intent = new Intent(this,WeatherActivity.class);
-                        startActivity(intent);
+                        Intent weatherIntent = new Intent(this,WeatherActivity.class);
+                        startActivity(weatherIntent);
                     }
-                }*/
+                }
 
                 break;
 
 
             case R.id.bt_bottom:
+                Intent interactionIntent = new Intent(this,InteractionActivity.class);
+                startActivity(interactionIntent);
                 break;
 
 
@@ -66,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MSG_PERMISSIONS_SUBWAY);
                     } else {
-                        Intent intent = new Intent(this,MapActivity.class);
-                        startActivity(intent);
+                        Intent mapIntent = new Intent(this,MapActivity.class);
+                        startActivity(mapIntent);
                     }
                 }
 

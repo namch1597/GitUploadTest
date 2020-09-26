@@ -2,6 +2,7 @@ package com.example.task;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -74,7 +76,6 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
         subways = ContentManager.getInstance().getSubways();
 
         binding.btSearch.setOnClickListener(this);
-        binding.btBack.setOnClickListener(this);
         binding.tvNowLocation.setOnClickListener(this);
 
         FirstViewSetting();
@@ -82,6 +83,11 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
     }
 
     public void FirstViewSetting() {
+        Toolbar toolbar = (Toolbar) binding.tbToolbar;
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         for (int i=0; i<subways.size(); i++) {
             subwayNames.add(subways.get(i).getName());
         }
@@ -104,76 +110,6 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
         }
 
         return juso;
-    }
-
-    @Override
-    public void onClick(View v) {
-
-        switch (v.getId()) {
-                case R.id.bt_search:
-
-                    binding.pbCenter.setVisibility(View.VISIBLE);
-
-                    Address leftText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spLeft.getSelectedItem().toString()));
-                    LatLng leftLatLng = new LatLng(leftText.getLatitude(),leftText.getLongitude());
-
-                    Address rightText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spRight.getSelectedItem().toString()));
-                    LatLng rightLatLng = new LatLng(rightText.getLatitude(),rightText.getLongitude());
-
-
-                    String from = String.valueOf(leftText.getLatitude()) + "," + String.valueOf(leftText.getLongitude());
-                    String to = String.valueOf(rightText.getLatitude()) + "," + String.valueOf(rightText.getLongitude());
-
-                    APIInterface subwayServices = APIClient.subwayServices(this);
-                    subwayServices.getDirection(from, to, "transit","AIzaSyA9lCWN--EpZshKkp2hrfsE-9Sr8GZyIQc")
-                            .enqueue(new Callback<DirectionResponses>() {
-                                @Override
-                                public void onResponse(@NonNull Call<DirectionResponses> call, @NonNull Response<DirectionResponses> response) {
-                                    mMap.clear();
-                                    addMarker(leftLatLng,"출발지점");
-                                    addMarker(rightLatLng,"도착지점");
-                                    drawPolyline(response);
-                                    Log.d("bisa dong oke", response.message());
-
-                                    LatLng SEARCHSTART = new LatLng(leftText.getLatitude(), leftText.getLongitude());
-
-                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(SEARCHSTART, 15));
-
-                                    binding.pbCenter.setVisibility(View.INVISIBLE);
-
-                                }
-
-                                @Override
-                                public void onFailure(@NonNull Call<DirectionResponses> call, @NonNull Throwable t) {
-                                    Log.e("anjir error", t.getLocalizedMessage());
-                                    binding.pbCenter.setVisibility(View.INVISIBLE);
-                                }
-                            });
-                break;
-                case R.id.tv_now_location:
-
-                    binding.pbCenter.setVisibility(View.VISIBLE);
-
-                    mMap.clear();
-
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(NOW);
-                    markerOptions.title("현재위치");
-                    mMap.addMarker(markerOptions);
-
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NOW, 15));
-
-                    binding.pbCenter.setVisibility(View.INVISIBLE);
-
-                    break;
-                case R.id.bt_back:
-
-                    finish();
-
-                break;
-
-        }
-
     }
 
     private void drawPolyline(@NonNull Response<DirectionResponses> response) {
@@ -252,5 +188,80 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
 
     }
 
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.bt_search:
+
+                binding.pbCenter.setVisibility(View.VISIBLE);
+
+                Address leftText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spLeft.getSelectedItem().toString()));
+                LatLng leftLatLng = new LatLng(leftText.getLatitude(),leftText.getLongitude());
+
+                Address rightText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spRight.getSelectedItem().toString()));
+                LatLng rightLatLng = new LatLng(rightText.getLatitude(),rightText.getLongitude());
+
+
+                String from = String.valueOf(leftText.getLatitude()) + "," + String.valueOf(leftText.getLongitude());
+                String to = String.valueOf(rightText.getLatitude()) + "," + String.valueOf(rightText.getLongitude());
+
+                APIInterface subwayServices = APIClient.subwayServices(this);
+                subwayServices.getDirection(from, to, "transit","AIzaSyA9lCWN--EpZshKkp2hrfsE-9Sr8GZyIQc")
+                        .enqueue(new Callback<DirectionResponses>() {
+                            @Override
+                            public void onResponse(@NonNull Call<DirectionResponses> call, @NonNull Response<DirectionResponses> response) {
+                                mMap.clear();
+                                addMarker(leftLatLng,"출발지점");
+                                addMarker(rightLatLng,"도착지점");
+                                drawPolyline(response);
+                                Log.d("bisa dong oke", response.message());
+
+                                LatLng SEARCHSTART = new LatLng(leftText.getLatitude(), leftText.getLongitude());
+
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(SEARCHSTART, 15));
+
+                                binding.pbCenter.setVisibility(View.INVISIBLE);
+
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<DirectionResponses> call, @NonNull Throwable t) {
+                                Log.e("anjir error", t.getLocalizedMessage());
+                                binding.pbCenter.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                break;
+            case R.id.tv_now_location:
+
+                binding.pbCenter.setVisibility(View.VISIBLE);
+
+                mMap.clear();
+
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(NOW);
+                markerOptions.title("현재위치");
+                mMap.addMarker(markerOptions);
+
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NOW, 15));
+
+                binding.pbCenter.setVisibility(View.INVISIBLE);
+
+                break;
+
+        }
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }

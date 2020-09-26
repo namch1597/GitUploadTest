@@ -17,14 +17,24 @@
         <LinearLayout
             android:id="@+id/ll_top"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/map">
+            app:layout_constraintBottom_toTopOf="@+id/map"
+            android:background="#D5D5D5">
+
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tb_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:layout_collapseMode="pin"
+                android:background="#D5D5D5"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="90dp"
+                android:background="#D5D5D5"
                 >
 
                 <TextView
@@ -38,16 +48,6 @@
                     android:maxLines="1"
                     android:maxLength="20"
                     android:textSize="15dp"
-                    android:layout_marginTop="15dp"
-                    />
-
-                <Button
-                    android:id="@+id/bt_back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:text="back"
                     />
 
                 <Spinner
@@ -56,7 +56,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_now_location"
                     />
 
                 <Spinner
@@ -66,7 +66,7 @@
                     android:layout_marginLeft="10dp"
                     app:layout_constraintLeft_toRightOf="@id/sp_left"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_now_location"
                     />
 
                 <Button
@@ -76,7 +76,7 @@
                     android:layout_marginLeft="10dp"
                     app:layout_constraintLeft_toRightOf="@id/sp_right"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_now_location"
                     android:text="Go"
                     />
 
