@@ -173,6 +173,7 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
         }
         if (addresses == null || addresses.size() == 0) {
 
+
         }
         Address address = addresses.get(0);
         return address;
@@ -212,14 +213,24 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
                             @Override
                             public void onResponse(@NonNull Call<DirectionResponses> call, @NonNull Response<DirectionResponses> response) {
                                 mMap.clear();
-                                addMarker(leftLatLng,"출발지점");
-                                addMarker(rightLatLng,"도착지점");
-                                drawPolyline(response);
-                                Log.d("bisa dong oke", response.message());
+                                if (response.body() == null) {
+                                    MarkerOptions markerOptions = new MarkerOptions();
+                                    markerOptions.position(NOW);
+                                    markerOptions.title("현재위치");
+                                    mMap.addMarker(markerOptions);
 
-                                LatLng SEARCHSTART = new LatLng(leftText.getLatitude(), leftText.getLongitude());
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NOW, 15));
+                                } else {
+                                    addMarker(leftLatLng,"출발지점");
+                                    addMarker(rightLatLng,"도착지점");
+                                    drawPolyline(response);
+                                    Log.d("bisa dong oke", response.message());
 
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(SEARCHSTART, 15));
+                                    LatLng SEARCHSTART = new LatLng(leftText.getLatitude(), leftText.getLongitude());
+
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(SEARCHSTART, 15));
+                                }
+
 
                                 binding.pbCenter.setVisibility(View.INVISIBLE);
 

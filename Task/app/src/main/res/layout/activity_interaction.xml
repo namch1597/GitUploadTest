@@ -18,14 +18,15 @@
             android:id="@+id/cl_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="@+id/ll_top"
+            android:fitsSystemWindows="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:fitsSystemWindows="true">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ll_top">
 
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/app_bar"
                 android:layout_width="match_parent"
-                android:layout_height="410dp">
+                android:layout_height="wrap_content">
 
                 <com.google.android.material.appbar.CollapsingToolbarLayout
                     android:layout_width="match_parent"
@@ -35,21 +36,30 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="350dp"
+                        android:background="@drawable/image"
+                        android:fitsSystemWindows="true"
                         android:scaleType="centerCrop"
                         android:transitionName="movieWork"
-                        app:layout_collapseMode="parallax"
-                        android:fitsSystemWindows="true"
-                        android:background="@drawable/image"/>
+                        app:layout_collapseMode="parallax" />
 
                     <androidx.appcompat.widget.Toolbar
                         android:id="@+id/tb_toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="?actionBarSize"
                         app:layout_collapseMode="pin"
-                        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+                        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
-
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tlTablayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="1dp"
+                    android:background="@android:color/background_light"
+                    app:tabMode="fixed"
+                    app:tabGravity="fill"
+                    app:tabTextColor="@color/colorPrimary"
+                    app:tabSelectedTextColor="@color/colorAccent" />
             </com.google.android.material.appbar.AppBarLayout>
 
             <androidx.viewpager.widget.ViewPager
@@ -58,15 +68,7 @@
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_interaction"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_anchor="@id/app_bar"
-                app:layout_anchorGravity="bottom"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            </androidx.recyclerview.widget.RecyclerView>
 
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

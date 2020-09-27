@@ -87,6 +87,18 @@
             android:textColor="#ffffff"
             />
 
+        <TextView
+            android:id="@+id/tv_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_min_max_temp"
+            android:layout_marginTop="25dp"
+            android:textSize="18dp"
+            android:textColor="#ffffff"
+            />
+
         <ProgressBar
             android:id="@+id/pb_center"
             style="@android:style/Widget.Material.Light.ProgressBar.Large.Inverse"

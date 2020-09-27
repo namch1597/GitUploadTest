@@ -26,6 +26,7 @@ import com.example.task.Network.APIInterface;
 import com.example.task.Utils.GpsTracker;
 import com.example.task.databinding.ActivityWeatherBinding;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -80,6 +81,10 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                 String nowTemp = Float.toString((float) (((1.8 * (weatherResponse.getMain().getTemp() - 273.15) + 32) - 32) / 1.8) );      //현재온도
                 String minTemp = Float.toString((float) (((1.8 * (weatherResponse.getMain().getTemp_min() - 273.15) + 32) - 32) / 1.8) );   //최저온도
                 String maxTemp = Float.toString((float) (((1.8 * (weatherResponse.getMain().getTemp_max() - 273.15) + 32) - 32) / 1.8) );   //최고온도
+
+                SimpleDateFormat format2 = new SimpleDateFormat ( "MM월dd일 HH시mm분");
+                String format_time2 = format2.format (System.currentTimeMillis());
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -102,6 +107,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                                         binding.tvWeather.setText(weather);
                                         binding.tvNowTemp.setText(nowTemp.substring(0,2) + "°C");
                                         binding.tvMinMaxTemp.setText("최고" + maxTemp.substring(0,2) + " °C/ 최저" + minTemp.substring(0,2) + "°C");
+                                        binding.tvNow.setText(format_time2);
                                         binding.pbCenter.setVisibility(View.INVISIBLE);
 
                                         return false;
