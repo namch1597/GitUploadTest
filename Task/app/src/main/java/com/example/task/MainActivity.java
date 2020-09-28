@@ -18,6 +18,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.task.Utils.BackPressCloseHandler;
 import com.example.task.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,View.OnTouchListener {
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int centerYvalue;
     Vibrator vibrator;
 
+    private BackPressCloseHandler backPressCloseHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.btLeft.setOnClickListener(this);
         binding.btRight.setOnClickListener(this);
         binding.llChildCenter.setOnTouchListener(this);
+
+        backPressCloseHandler = new BackPressCloseHandler(this);
 
         final LinearLayout layout = (LinearLayout) findViewById(R.id.ll_center);
         ViewTreeObserver vto = layout.getViewTreeObserver();
@@ -207,5 +212,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        backPressCloseHandler.onBackPressed();
     }
 }
