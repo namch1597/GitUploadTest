@@ -28,6 +28,9 @@ import com.example.task.Network.APIClient;
 import com.example.task.Network.APIInterface;
 import com.example.task.Utils.GpsTracker;
 import com.example.task.databinding.ActivityWeatherBinding;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -147,6 +150,28 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
         WeatherViewPagerAdapter weatherViewPagerAdapter = new WeatherViewPagerAdapter(WeatherActivity.this,datas);
         viewPager.setAdapter(weatherViewPagerAdapter);
+
+        TabLayout tabLayout = (TabLayout) binding.tabLayout;
+        for (int i=0; i<datas.size(); i++) {
+            tabLayout.addTab(tabLayout.newTab());
+        }
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition() + datas.size());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -164,6 +189,8 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                 } else {
                     currentPage = position;
                 }
+                tabLayout.setScrollPosition(currentPage - datas.size(), 0f, true);
+
             }
 
             @Override
@@ -181,6 +208,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                     currentPage = datas.size();
                 }
                 viewPager.setCurrentItem(currentPage, false);
+                tabLayout.setScrollPosition(currentPage - datas.size(), 0f, true);
                 currentPage++;
             }
         };
