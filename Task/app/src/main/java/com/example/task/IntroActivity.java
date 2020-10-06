@@ -119,7 +119,7 @@ public class IntroActivity extends AppCompatActivity {
 
             }
 
-            ContentManager.getInstance().setSubways(Subways);
+//            ContentManager.getInstance().setSubways(Subways);
         }catch (JSONException e) {
             e.printStackTrace();
         }
