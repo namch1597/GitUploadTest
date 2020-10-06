@@ -24,6 +24,8 @@ import com.example.task.Network.APIInterface;
 import com.example.task.Utils.ContentManager;
 import com.example.task.Utils.GpsTracker;
 import com.example.task.databinding.ActivityMapBinding;
+import com.example.task.room.AppDatabase;
+import com.example.task.room.Metro;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -56,11 +58,16 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
     ArrayList<Subway>subways = new ArrayList<Subway>();
     ArrayList<String>subwayNames = new ArrayList<String>();
 
+    List<Metro>metros;
+    ArrayList<String>metroNames = new ArrayList<String>();
+
     ArrayAdapter spinnerLeftAdapter;
     ArrayAdapter spinnerRightAdapter;
 
     String realJuso;
     LatLng NOW;
+
+    AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +80,11 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        subways = ContentManager.getInstance().getSubways();
+        db = AppDatabase.getInstance(this);
+        metros = db.metroDAO().getAll();
+
+        //json singleton 방식
+//        subways = ContentManager.getInstance().getSubways();
 
         binding.btSearch.setOnClickListener(this);
         binding.tvNowLocation.setOnClickListener(this);
@@ -88,13 +99,24 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        for (int i=0; i<subways.size(); i++) {
+        //json singleton 방식
+        /*for (int i=0; i<subways.size(); i++) {
             subwayNames.add(subways.get(i).getName());
         }
         spinnerLeftAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, subwayNames);
         binding.spLeft.setAdapter(spinnerLeftAdapter);
 
         spinnerRightAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, subwayNames);
+        binding.spRight.setAdapter(spinnerRightAdapter);*/
+
+        for (int i=0; i<metros.size(); i++) {
+            metroNames.add(metros.get(i).getName());
+        }
+
+        spinnerLeftAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, metroNames);
+        binding.spLeft.setAdapter(spinnerLeftAdapter);
+
+        spinnerRightAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, metroNames);
         binding.spRight.setAdapter(spinnerRightAdapter);
 
     }
@@ -102,24 +124,40 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
     public String getRealJuso(String subwayName) {
         String juso = "";
 
-
-        for (int i=0; i<subways.size(); i++) {
+        //json singleton 방식
+        /*for int i=0; i<subways.size(); i++) {
             if (subways.get(i).getName().equals(subwayName)) {
-                juso = subways.get(i).getAddress();
+                juso = subways.get(i).getRdnmadr();
             }
-        }
+        }*/
+
+        Metro metro = db.metroDAO().getDetailPath(subwayName);
+        juso = metro.getRealPath();
+
+        System.out.println("---juso : " + juso);
 
         return juso;
     }
 
     private void drawPolyline(@NonNull Response<DirectionResponses> response) {
         if (response.body() != null) {
+            if (response.body().getRoutes().size() == 0 || response.body().getRoutes().get(0).getOverviewPolyline().getPoints() == null) {
+                mMap.clear();
+
+                addMyLocationMarker();
+
+                return;
+            }
             String shape = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
             PolylineOptions polyline = new PolylineOptions()
                     .addAll(PolyUtil.decode(shape))
                     .width(15f)
                     .color(Color.RED);
             mMap.addPolyline(polyline);
+
+            binding.tvLeft.setVisibility(View.VISIBLE);
+            binding.tvRight.setVisibility(View.VISIBLE);
+
         }
     }
 
@@ -172,8 +210,7 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
 
         }
         if (addresses == null || addresses.size() == 0) {
-
-
+            return null;
         }
         Address address = addresses.get(0);
         return address;
@@ -204,6 +241,12 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
                 LatLng rightLatLng = new LatLng(rightText.getLatitude(),rightText.getLongitude());
 
 
+                binding.tvLeft.setText(binding.spLeft.getSelectedItem().toString()+" 위도,경도 : " + Double.toString(leftText.getLatitude()).substring(0,7)
+                        + "," + Double.toString(leftText.getLongitude()).substring(0,8));
+                binding.tvRight.setText(binding.spRight.getSelectedItem().toString()+" 위도,경도 : " + Double.toString(rightText.getLatitude()).substring(0,7)
+                        + "," + Double.toString(rightText.getLongitude()).substring(0,8));
+
+
                 String from = String.valueOf(leftText.getLatitude()) + "," + String.valueOf(leftText.getLongitude());
                 String to = String.valueOf(rightText.getLatitude()) + "," + String.valueOf(rightText.getLongitude());
 
@@ -214,21 +257,25 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
                             public void onResponse(@NonNull Call<DirectionResponses> call, @NonNull Response<DirectionResponses> response) {
                                 mMap.clear();
                                 if (response.body() == null) {
-                                    MarkerOptions markerOptions = new MarkerOptions();
-                                    markerOptions.position(NOW);
-                                    markerOptions.title("현재위치");
-                                    mMap.addMarker(markerOptions);
 
-                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NOW, 15));
+                                    addMyLocationMarker();
+
+                                    Toast.makeText(MapActivity.this, "위치찾기 실패 현재위치로 이동합니다.", Toast.LENGTH_SHORT).show();
+
+                                    binding.tvLeft.setVisibility(View.GONE);
+                                    binding.tvRight.setVisibility(View.GONE);
+
+
                                 } else {
                                     addMarker(leftLatLng,"출발지점");
                                     addMarker(rightLatLng,"도착지점");
-                                    drawPolyline(response);
-                                    Log.d("bisa dong oke", response.message());
 
                                     LatLng SEARCHSTART = new LatLng(leftText.getLatitude(), leftText.getLongitude());
 
                                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(SEARCHSTART, 15));
+
+                                    drawPolyline(response);
+                                    Log.d("bisa dong oke", response.message());
                                 }
 
 
@@ -244,17 +291,14 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
                         });
                 break;
             case R.id.tv_now_location:
+                binding.tvLeft.setVisibility(View.GONE);
+                binding.tvRight.setVisibility(View.GONE);
 
                 binding.pbCenter.setVisibility(View.VISIBLE);
 
                 mMap.clear();
 
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(NOW);
-                markerOptions.title("현재위치");
-                mMap.addMarker(markerOptions);
-
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NOW, 15));
+                addMyLocationMarker();
 
                 binding.pbCenter.setVisibility(View.INVISIBLE);
 
@@ -262,6 +306,20 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
 
         }
 
+    }
+
+    public void addMyLocationMarker() {
+
+        //위도 경도 TEXT 들
+        binding.tvLeft.setVisibility(View.GONE);
+        binding.tvRight.setVisibility(View.GONE);
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(NOW);
+        markerOptions.title("현재위치");
+        mMap.addMarker(markerOptions);
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NOW, 15));
     }
 
     @Override

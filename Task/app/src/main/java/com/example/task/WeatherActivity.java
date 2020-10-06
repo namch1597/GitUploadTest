@@ -5,12 +5,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
+import androidx.viewpager.widget.ViewPager;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.task.Adapter.WeatherViewPagerAdapter;
 import com.example.task.Model.WeatherModel.WeatherResponse;
 import com.example.task.Network.APIClient;
 import com.example.task.Network.APIInterface;
@@ -27,8 +30,11 @@ import com.example.task.Utils.GpsTracker;
 import com.example.task.databinding.ActivityWeatherBinding;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,14 +49,20 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     double latitude = 0.0f;
     double longitude = 0.0f;
 
+    ArrayList<String>datas = new ArrayList<String>();
+
     WeatherResponse weatherResponse;
     String realJuso;
+
+    int currentPage = 0;
+    Timer timer;
+    final long DELAY_MS = 3000;
+    final long TIME_MS = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_weather);
-
         FirstViewSetting();
 
     }
@@ -110,6 +122,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                                         binding.tvNow.setText(format_time2);
                                         binding.pbCenter.setVisibility(View.INVISIBLE);
 
+                                        datas.add("습도 : " + humidity);
+                                        datas.add("풍속 : " + speed + "m/s");
+                                        datas.add("최고 : " + maxTemp.substring(0,2) + " °C");
+                                        datas.add("최저 : " + minTemp.substring(0,2) + "°C");
+                                        setupViewPager(binding.viewpager,datas);
+
                                         return false;
                                     }
                                 }).into(binding.ivIcon);
@@ -125,27 +143,78 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         });
     }
 
+    private void setupViewPager(ViewPager viewPager,ArrayList<String> datas) {
+
+        WeatherViewPagerAdapter weatherViewPagerAdapter = new WeatherViewPagerAdapter(WeatherActivity.this,datas);
+        viewPager.setAdapter(weatherViewPagerAdapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position < datas.size()) {
+                    currentPage = position + datas.size();
+                    viewPager.setCurrentItem(currentPage, false);
+                } else if (position >= datas.size()*2) {
+                    currentPage = position - datas.size();
+                    viewPager.setCurrentItem(currentPage, false);
+                } else {
+                    currentPage = position;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        Handler handler = new Handler();
+        Runnable Update = new Runnable() {
+            public void run() {
+                if (currentPage == 0) {
+                    currentPage = datas.size() + 1;
+                } else if (currentPage >= datas.size()*2) {
+                    currentPage = datas.size();
+                }
+                viewPager.setCurrentItem(currentPage, false);
+                currentPage++;
+            }
+        };
+
+        timer = new Timer(); // This will create a new Thread
+        timer.schedule(new TimerTask() { // task to be scheduled
+            @Override
+            public void run() {
+                handler.post(Update);
+            }
+        }, DELAY_MS, TIME_MS);
+
+    }
 
     private String transferWeather(String weather) {
 
         weather = weather.toLowerCase();
         String result = "알수없음";
 
-        if (weather.equals("haze")) {
+        if ("haze".equals(weather)) {
             return "안개";
-        } else if (weather.equals("fog")) {
+        } else if ("fog".equals(weather)) {
             return "안개";
-        } else if (weather.equals("clouds")) {
+        } else if ("clouds".equals(weather)) {
             return "구름";
-        } else if (weather.equals("few clouds")) {
+        } else if ("few clouds".equals(weather)) {
             return "구름 조금";
-        } else if (weather.equals("scattered clouds")) {
+        } else if ("scattered clouds".equals(weather)) {
             return "구름 낌";
-        } else if (weather.equals("broken clouds")) {
+        } else if ("broken clouds".equals(weather)) {
             return "구름 많음";
-        } else if (weather.equals("overcast clouds")) {
+        } else if ("overcast clouds".equals(weather)) {
             return "맑음";
-        } else if (weather.equals("clear sky")) {
+        } else if ("clear sky".equals(weather)) {
             return "안개";
         }
 

@@ -1,6 +1,7 @@
 package com.example.task;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -8,6 +9,8 @@ import android.os.Bundle;
 
 import com.example.task.Model.SubwayModel.Subway;
 import com.example.task.Utils.ContentManager;
+import com.example.task.room.AppDatabase;
+import com.example.task.room.Metro;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,12 +28,15 @@ public class IntroActivity extends AppCompatActivity {
     ContentManager contentManager;
     public ArrayList<Subway> Subways = new ArrayList<Subway>();
 
+    AppDatabase db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
 
         contentManager = new ContentManager();
+        db = AppDatabase.getInstance(this);
         getJsonString();
         splashThread =  new Thread(new Runnable() {
             @Override
@@ -52,7 +58,6 @@ public class IntroActivity extends AppCompatActivity {
         });
 
         splashThread.start();
-
     }
 
     public void stopIntro() {
@@ -97,15 +102,21 @@ public class IntroActivity extends AppCompatActivity {
             {
                 JSONObject subwayObject = subwayArray.getJSONObject(i);
 
-                Subway subway = new Subway();
+                /*Subway subway = new Subway();
 
                 subway.setAddress(subwayObject.getString("adres"));
                 subway.setLine(subwayObject.getString("line"));
-                subway.setName(subwayObject.getString("statn_nm"));
+                subway.setRdnmadr(subwayObject.getString("rdnmadr"));
+                subway.setName(subwayObject.getString("statn_nm"));*/
 
 //                System.out.println("----주소 : " + subway.getAddress() + " //라인 : " + subway.getLine() + " //역 이름 : " + subway.getName());
 
-                Subways.add(subway);
+//                Subways.add(subway);
+
+                Metro metro = new Metro((i+1), subwayObject.getString("statn_nm"), subwayObject.getString("rdnmadr"), subwayObject.getString("adres"),
+                        subwayObject.getString("line"));
+                db.metroDAO().insertMetro(metro);
+
             }
 
             ContentManager.getInstance().setSubways(Subways);

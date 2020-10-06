@@ -3,19 +3,14 @@ package com.example.task;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.example.task.Adapter.JsAdapter;
 import com.example.task.Adapter.ViewPagerAdapter;
 import com.example.task.databinding.ActivityInteractionBinding;
 import com.google.android.material.tabs.TabLayout;
-
-import java.util.ArrayList;
 
 public class InteractionActivity extends AppCompatActivity {
 

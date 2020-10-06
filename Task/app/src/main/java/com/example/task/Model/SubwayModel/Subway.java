@@ -4,6 +4,7 @@ public class Subway {
 
     public String name;
     public String address;
+    public String rdnmadr;
     public String line;
 
     public String getName() {
@@ -28,5 +29,13 @@ public class Subway {
 
     public void setLine(String line) {
         this.line = line;
+    }
+
+    public String getRdnmadr() {
+        return rdnmadr;
+    }
+
+    public void setRdnmadr(String rdnmadr) {
+        this.rdnmadr = rdnmadr;
     }
 }
