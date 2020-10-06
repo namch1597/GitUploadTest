@@ -235,9 +235,19 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
                 binding.pbCenter.setVisibility(View.VISIBLE);
 
                 Address leftText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spLeft.getSelectedItem().toString()));
+                if (leftText == null) {
+                    addMyLocationMarker();
+                    Toast.makeText(MapActivity.this, "위치찾기 실패 현재위치로 이동합니다.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 LatLng leftLatLng = new LatLng(leftText.getLatitude(),leftText.getLongitude());
 
                 Address rightText = getCurrentAddress(0.0f,0.0f,getRealJuso(binding.spRight.getSelectedItem().toString()));
+                if (rightText == null) {
+                    addMyLocationMarker();
+                    Toast.makeText(MapActivity.this, "위치찾기 실패 현재위치로 이동합니다.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 LatLng rightLatLng = new LatLng(rightText.getLatitude(),rightText.getLongitude());
 
 
@@ -320,6 +330,7 @@ public class MapActivity extends AppCompatActivity  implements OnMapReadyCallbac
         mMap.addMarker(markerOptions);
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NOW, 15));
+        binding.pbCenter.setVisibility(View.INVISIBLE);
     }
 
     @Override
