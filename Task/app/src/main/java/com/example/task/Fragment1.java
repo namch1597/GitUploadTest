@@ -29,6 +29,7 @@ public class Fragment1  extends Fragment {
 
 
     public void addData() {
+
         list.add("진선");
         list.add("진선1");
         list.add("진선2");
@@ -58,5 +59,6 @@ public class Fragment1  extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 mLinearLayoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
+
     }
 }
